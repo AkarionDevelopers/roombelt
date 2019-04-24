@@ -65,7 +65,7 @@ const Buttons = ({ onSubmit, onCancel, isSubmitting }) => (
 const mapStateToProps = state => ({
   connectionCode: state.connectDeviceWizard.connectionCode,
   connectionError: state.connectDeviceWizard.errorMessage,
-  isSubmitting: state.connectDeviceWizard.isSubmitting
+  isSubmitting: !!state.connectDeviceWizard.submitButton
 });
 
 const mapDispatchToProps = dispatch => ({

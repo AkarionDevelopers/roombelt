@@ -4,11 +4,10 @@ import premiumPlans from "services/premium-plans";
 export const newDeviceDataSelector = state => ({
   connectionCode: state.connectDeviceWizard.connectionCode,
   deviceId: state.connectDeviceWizard.deviceId,
-  calendarId: state.connectDeviceWizard.calendarId,
   deviceType: state.connectDeviceWizard.deviceType,
+  calendarId: state.connectDeviceWizard.calendarId,
   language: state.connectDeviceWizard.language,
-  clockType: state.connectDeviceWizard.clockType,
-  showAvailableRooms: state.connectDeviceWizard.showAvailableRooms
+  clockType: state.connectDeviceWizard.clockType
 });
 
 export const editDeviceDataSelector = state => ({
@@ -20,7 +19,9 @@ export const editDeviceDataSelector = state => ({
   clockType: state.editedDevice.data.clockType,
   minutesForCheckIn: state.editedDevice.data.minutesForCheckIn,
   minutesForStartEarly: state.editedDevice.data.minutesForStartEarly,
-  showAvailableRooms: state.editedDevice.data.showAvailableRooms
+  showAvailableRooms: state.editedDevice.data.showAvailableRooms,
+  showTentativeMeetings: state.editedDevice.data.showTentativeMeetings,
+  isReadOnlyDevice: state.editedDevice.data.isReadOnlyDevice
 });
 
 export const isGoogleAccountSelector = state => state.user && state.user.provider === "google";

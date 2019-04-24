@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components/macro";
-import { useWizard } from "apps/admin/wizard/Wizard";
+import { useWizard } from "apps/admin/modals/wizard/Wizard";
 import { ensureElement } from "utils/react";
 
 const FooterWrapper = styled.div`

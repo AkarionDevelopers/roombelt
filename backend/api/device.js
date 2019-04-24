@@ -46,9 +46,10 @@ router.use("/device", async function(req, res) {
   return "next";
 });
 
-async function getCalendarInfo(calendarId, calendarProvider) {
+async function getCalendarInfo(calendarId, calendarProvider, showTentativeMeetings) {
   const calendar = calendarId && await calendarProvider.getCalendar(calendarId);
-  const calendarEvents = calendarId && await calendarProvider.getEvents(calendarId);
+  const calendarEvents = calendarId && await calendarProvider.getEvents(calendarId, { showTentativeMeetings });
+
   const events = calendarId && calendarEvents
     .filter(event => event.isAllDayEvent || getTimestamp(event.end) > Date.now())
     .slice(0, 10)
@@ -62,7 +63,7 @@ async function getCalendarInfo(calendarId, calendarProvider) {
   return calendar && {
     id: calendarId,
     name: calendar && calendar.summary,
-    canModifyEvents: calendar && (calendar.accessRole === "writer" || calendar.accessRole === "owner"),
+    canModifyEvents: calendar && calendar.canModifyEvents,
     events
   };
 }
@@ -74,7 +75,9 @@ async function getUserCalendars(req) {
     .filter(calendarId => calendarId);
 
   const uniqueCalendarIds = [...new Set(calendarIds)];
-  const calendars = await Promise.all(uniqueCalendarIds.map(calendarId => getCalendarInfo(calendarId, req.context.calendarProvider)));
+  const calendars = await Promise.all(uniqueCalendarIds.map(
+    calendarId => getCalendarInfo(calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings))
+  );
 
   return calendars.filter(calendar => calendar);
 }
@@ -86,17 +89,19 @@ router.get("/device", async function(req, res) {
   const isCalendarSelected = device.calendarId;
   const getAllCalendars = isDashboard || (isCalendarSelected && req.query["all-calendars"] === "true");
 
-  const calendar = isCalendarSelected ? await getCalendarInfo(device.calendarId, req.context.calendarProvider) : null;
+  const calendar = isCalendarSelected ? await getCalendarInfo(device.calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings) : null;
   const allCalendars = getAllCalendars ? await getUserCalendars(req) : null;
+  const isReadOnlyDevice = device.isReadOnlyDevice || (calendar && !calendar.canModifyEvents);
 
   res.json({
-    deviceType: req.context.device.deviceType,
-    language: process.env["REFRESH_LANG"] || req.context.device.language,
-    clockType: req.context.device.clockType,
-    connectionCode: req.context.device.connectionCode,
-    minutesForCheckIn: req.context.device.minutesForCheckIn,
-    minutesForStartEarly: req.context.device.minutesForStartEarly,
-    showAvailableRooms: req.context.device.showAvailableRooms,
+    deviceType: device.deviceType,
+    language: process.env["REFRESH_LANG"] || device.language,
+    clockType: device.clockType,
+    connectionCode: device.connectionCode,
+    minutesForCheckIn: isReadOnlyDevice ? 0 : device.minutesForCheckIn,
+    minutesForStartEarly: isReadOnlyDevice ? 15 : device.minutesForStartEarly,
+    showAvailableRooms: device.showAvailableRooms,
+    isReadOnlyDevice,
     calendar,
     allCalendars
   });
@@ -121,7 +126,10 @@ router.post("/device/meeting", async function(req, res) {
   logger.info(`Creating new meeting from device ${req.context.session.deviceId} in calendar ${calendarId}`);
 
   const calendar = await req.context.calendarProvider.getCalendar(calendarId);
-  const events = await req.context.calendarProvider.getEvents(calendarId, { invalidateCache: true });
+  const events = await req.context.calendarProvider.getEvents(calendarId, {
+    invalidateCache: true,
+    showTentativeMeetings: req.context.device.showTentativeMeetings
+  });
 
   const currentEvent = events.find(event => !event.isAllDayEvent && getTimestamp(event.start) < Date.now() && getTimestamp(event.end) > Date.now());
   if (currentEvent) {
@@ -146,7 +154,10 @@ router.post("/device/meeting", async function(req, res) {
 router.put("/device/meeting/:meetingId", async function(req, res) {
   logger.info(`Altering meeting ${req.params.meetingId} from device ${req.context.session.deviceId}`);
 
-  const events = await req.context.calendarProvider.getEvents(req.context.device.calendarId, { invalidateCache: true });
+  const events = await req.context.calendarProvider.getEvents(req.context.device.calendarId, {
+    invalidateCache: true,
+    showTentativeMeetings: req.context.device.showTentativeMeetings
+  });
   const event = events.find(event => event.id === req.params.meetingId);
 
   if (event === -1) {

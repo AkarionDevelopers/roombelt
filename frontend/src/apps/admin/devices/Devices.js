@@ -8,6 +8,7 @@ import IoAndroidMoreVertical from "react-icons/lib/io/android-more-vertical";
 import { translations } from "i18n";
 
 import {
+  Badge,
   Card,
   DropdownMenu,
   DropdownMenuItem,
@@ -35,10 +36,17 @@ const SingleDeviceRow = props => (
   <CalendarRowWrapper>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
       <Text block>
-        {props.device.deviceType === "dashboard" && (props.device.location ? props.device.location :
-          <em>Dashboard</em>)}
-        {props.device.deviceType === "calendar" && (props.calendar ? props.calendar.summary :
-          <em>No calendar connected</em>)}
+        {props.device.deviceType === "dashboard" && props.device.location}
+        {props.device.deviceType === "dashboard" && !props.device.location && <em>Dashboard</em>}
+
+        {props.device.deviceType === "calendar" && !props.calendar && <em>No calendar connected</em>}
+        {props.device.deviceType === "calendar" && props.calendar && <>
+          {props.calendar.summary}
+          {" "}
+          {(props.device.isReadOnlyDevice || !props.calendar.canModifyEvents) && (
+            <Badge warning style={{ fontSize: 12 }}>Read only</Badge>
+          )}
+        </>}
       </Text>
       <Text muted small>
         Added: {moment(props.device.createdTimestamp).format("MMM DD, YYYY ")}
@@ -50,24 +58,6 @@ const SingleDeviceRow = props => (
       </Text>
       <Text muted small>
         {props.device.clockType}h clock
-      </Text>
-    </TableRowColumn>
-    <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
-      <Text>
-        {props.device.deviceType === "dashboard" && <>
-          <Text muted small>Highlight available rooms:</Text>
-          <Text block>{props.device.showAvailableRooms ? "Yes" : "No"}</Text>
-        </>
-        }
-        {props.device.deviceType === "calendar" && <>
-          <Text muted small>Check-in:</Text>
-          <Text block>
-            Allowed {props.device.minutesForStartEarly} min before meeting
-            <br/>
-            {props.device.minutesForCheckIn ? `Required in the first ${props.device.minutesForCheckIn} min` : "Not required"}
-          </Text>
-        </>
-        }
       </Text>
     </TableRowColumn>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
@@ -87,7 +77,6 @@ const SingleDeviceRow = props => (
     </TableRowColumn>
   </CalendarRowWrapper>
 );
-
 
 const Devices = props => {
   if (!props.isLoaded) {
@@ -122,7 +111,6 @@ const Devices = props => {
           <TableRow>
             <TableHeaderColumn>Device</TableHeaderColumn>
             <TableHeaderColumn>Locale</TableHeaderColumn>
-            <TableHeaderColumn>Settings</TableHeaderColumn>
             <TableHeaderColumn>Status</TableHeaderColumn>
             <TableHeaderColumn style={{ width: 50 }}/>
           </TableRow>

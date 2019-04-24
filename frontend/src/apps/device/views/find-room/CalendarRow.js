@@ -9,6 +9,7 @@ import {
   isActionErrorSelector,
   isActionSuccessSelector,
   isAmPmClockSelector,
+  isReadOnlyDeviceSelector,
   isRetryingActionSelector,
   nextMeetingSelector,
   timestampSelector
@@ -46,7 +47,6 @@ const Content = styled.div`
  font-size: 0.8rem; 
  margin-top: 0.5rem;
  line-height: 1.2rem;
- min-height: 1.2rem; 
  overflow: hidden;
 `;
 
@@ -67,7 +67,7 @@ const getAvailability = (isAllDayMeeting, timeToStart, minutesAvailable) => {
 };
 
 
-const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, timestamp, currentActionSource, isCurrentActionSuccess, isCurrentActionError, isRetryingAction, createMeeting, acknowledgeMeetingCreated, isAmPmClock }) => {
+const CalendarRow = ({ calendarId, isReadOnlyDevice, calendarName, currentMeeting, nextMeeting, timestamp, currentActionSource, isCurrentActionSuccess, isCurrentActionError, isRetryingAction, createMeeting, acknowledgeMeetingCreated, isAmPmClock }) => {
   const startTimestamp = currentMeeting ? currentMeeting.endTimestamp : timestamp;
   const endTimestamp = nextMeeting ? nextMeeting.startTimestamp : Number.POSITIVE_INFINITY;
 
@@ -81,7 +81,7 @@ const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, ti
   const showError = isCurrentActionFromThisCalendar && isCurrentActionError;
   const showSuccessInfo = isCurrentActionFromThisCalendar && isCurrentActionSuccess;
   const showMeetingDetails = !isAvailable && !showSuccessInfo && !showError;
-  const showButtons = isAvailable && !showSuccessInfo && !showError;
+  const showButtons = !isReadOnlyDevice && isAvailable && !showSuccessInfo && !showError;
 
   const CreateButton = ({ value, name }) => (
     <LoaderButton
@@ -137,7 +137,8 @@ const mapStateToProps = (state, { calendarId }) => ({
   isCurrentActionError: isActionErrorSelector(state),
   isCurrentActionSuccess: isActionSuccessSelector(state),
   currentActionSource: currentActionSourceSelector(state),
-  isAmPmClock: isAmPmClockSelector(state)
+  isAmPmClock: isAmPmClockSelector(state),
+  isReadOnlyDevice: isReadOnlyDeviceSelector(state)
 });
 
 const mapDispatchToProps = (dispatch) => ({

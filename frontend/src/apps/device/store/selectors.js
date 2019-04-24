@@ -30,6 +30,7 @@ export const isDashboardDeviceSelector = createSelector(deviceSelector, device =
 export const isCalendarSelectedSelector = createSelector(deviceSelector, device => device && !!device.calendar);
 export const isAmPmClockSelector = createSelector(deviceSelector, device => device ? device.clockType === 12 : true);
 export const showAvailableRoomsSelector = createSelector(deviceSelector, device => device && device.showAvailableRooms);
+export const isReadOnlyDeviceSelector = createSelector(deviceSelector, device => device && device.isReadOnlyDevice);
 
 export const allCalendarsSelector = createSelector(deviceSelector, device => (device && device.allCalendars) || []);
 export const areAllCalendarsLoadedSelector = createSelector(deviceSelector, device => device && !!device.allCalendars);

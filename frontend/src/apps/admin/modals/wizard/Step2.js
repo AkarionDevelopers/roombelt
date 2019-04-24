@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import WizardStepLayout from "./WizardStepLayout";
-import { Text, Select, Button } from "theme";
+import { Button, LoaderButton, Select, Text } from "theme";
 import { connectDeviceWizardActions } from "apps/admin/store/actions";
 import { useWizard } from "./Wizard";
 
@@ -32,20 +32,24 @@ const Content = ({ deviceType, setDeviceType }) => {
   );
 };
 
-const Buttons = ({ deviceType, onSubmit }) => (
-  <>
-    <Button primary disabled={deviceType === null} onClick={onSubmit}>Next</Button>
-  </>
+const Buttons = ({ deviceType, submitButton, onSubmit, onShowAdvancedConfiguration }) => (
+  <div>
+    <LoaderButton link onClick={onShowAdvancedConfiguration} isLoading={submitButton === "show-advanced"}>
+      Advanced configuration
+    </LoaderButton>
+    <Button primary disabled={deviceType === null || !!submitButton} onClick={onSubmit}>Next</Button>
+  </div>
 );
 
-
 const mapStateToProps = state => ({
-  deviceType: state.connectDeviceWizard.deviceType
+  deviceType: state.connectDeviceWizard.deviceType,
+  submitButton: state.connectDeviceWizard.submitButton
 });
 
 const mapDispatchToProps = dispatch => ({
   setDeviceType: type => dispatch(connectDeviceWizardActions.secondStep.setDeviceType(type)),
-  onSubmit: () => dispatch(connectDeviceWizardActions.secondStep.nextStep())
+  onSubmit: () => dispatch(connectDeviceWizardActions.secondStep.nextStep()),
+  onShowAdvancedConfiguration: () => dispatch(connectDeviceWizardActions.submit("show-advanced", true))
 });
 
 export default {

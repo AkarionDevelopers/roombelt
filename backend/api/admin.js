@@ -5,7 +5,7 @@ const context = require("../context");
 const logger = require("../logger");
 const paddle = require("../services/paddle");
 
-const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms }) => ({
+const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice }) => ({
   id: deviceId,
   createdAt: new Date(createdAt).getTime(),
   deviceType,
@@ -14,6 +14,8 @@ const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType,
   minutesForCheckIn,
   minutesForStartEarly,
   showAvailableRooms,
+  showTentativeMeetings,
+  isReadOnlyDevice,
   language: language || "en",
   clockType: clockType,
   isOnline: lastActivityAt > Date.now() - 70 * 1000,
@@ -134,14 +136,7 @@ router.put("/admin/device/:deviceId", checkSubscription, async function(req, res
     }
   }
 
-  await req.context.storage.devices.setTypeForDevice(req.params.deviceId, req.body.deviceType);
-  await req.context.storage.devices.setCalendarForDevice(req.params.deviceId, req.body.calendarId);
-  await req.context.storage.devices.setLocationForDevice(req.params.deviceId, String(req.body.location).trim());
-  await req.context.storage.devices.setLanguageForDevice(req.params.deviceId, req.body.language);
-  await req.context.storage.devices.setClockTypeForDevice(req.params.deviceId, req.body.clockType);
-  await req.context.storage.devices.setMinutesForCheckIn(req.params.deviceId, req.body.minutesForCheckIn);
-  await req.context.storage.devices.setMinutesForStartEarly(req.params.deviceId, req.body.minutesForStartEarly);
-  await req.context.storage.devices.setShowAvailableRooms(req.params.deviceId, req.body.showAvailableRooms);
+  await req.context.storage.devices.setDeviceOptions(req.params.deviceId, req.body);
 
   res.sendStatus(204);
 });

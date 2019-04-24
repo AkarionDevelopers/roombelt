@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Modal } from "theme/index";
+import { Modal } from "theme";
 import { connect } from "react-redux";
 
 import Wizard from "./Wizard";

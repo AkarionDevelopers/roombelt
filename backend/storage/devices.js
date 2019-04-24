@@ -16,7 +16,9 @@ module.exports = class {
       lastActivityAt: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
       minutesForCheckIn: { type: Sequelize.INTEGER, defaultValue: 0 },
       minutesForStartEarly: { type: Sequelize.INTEGER, defaultValue: 5 },
-      showAvailableRooms: { type: Sequelize.BOOLEAN, defaultValue: false }
+      showAvailableRooms: { type: Sequelize.BOOLEAN, defaultValue: false },
+      showTentativeMeetings: { type: Sequelize.BOOLEAN, defaultValue: true },
+      isReadOnlyDevice: { type: Sequelize.BOOLEAN, defaultValue: false }
     });
   }
 
@@ -54,35 +56,18 @@ module.exports = class {
     await this.Model.update({ lastActivityAt: new Date() }, { where: { deviceId } });
   }
 
-  async setTypeForDevice(deviceId, deviceType) {
-    await this.Model.update({ deviceType }, { where: { deviceId } });
-  }
-
-  async setCalendarForDevice(deviceId, calendarId) {
-    await this.Model.update({ calendarId }, { where: { deviceId } });
-  }
-
-  async setLocationForDevice(deviceId, location) {
-    await this.Model.update({ location }, { where: { deviceId } });
-  }
-
-  async setLanguageForDevice(deviceId, language) {
-    await this.Model.update({ language }, { where: { deviceId } });
-  }
-
-  async setClockTypeForDevice(deviceId, clockType) {
-    await this.Model.update({ clockType }, { where: { deviceId } });
-  }
-
-  async setMinutesForCheckIn(deviceId, minutesForCheckIn) {
-    await this.Model.update({ minutesForCheckIn }, { where: { deviceId } });
-  }
-
-  async setMinutesForStartEarly(deviceId, minutesForStartEarly) {
-    await this.Model.update({ minutesForStartEarly }, { where: { deviceId } });
-  }
-
-  async setShowAvailableRooms(deviceId, showAvailableRooms) {
-    await this.Model.update({ showAvailableRooms }, { where: { deviceId } });
+  async setDeviceOptions(deviceId, { deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice }) {
+    await this.Model.update({
+      deviceType,
+      calendarId,
+      location,
+      language,
+      clockType,
+      minutesForCheckIn,
+      minutesForStartEarly,
+      showAvailableRooms,
+      showTentativeMeetings,
+      isReadOnlyDevice
+    }, { where: { deviceId } });
   }
 };

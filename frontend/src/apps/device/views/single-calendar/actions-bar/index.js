@@ -1,12 +1,18 @@
 import React from "react";
 import { connect } from "react-redux";
-import { currentMeetingSelector, isActionErrorSelector, isRetryingActionSelector } from "apps/device/store/selectors";
+import {
+  currentMeetingSelector,
+  isActionErrorSelector,
+  isReadOnlyDeviceSelector,
+  isRetryingActionSelector
+} from "apps/device/store/selectors";
 
 import ActionError from "../../../components/ActionError";
 import RoomAvailable from "./RoomAvailable";
 import MeetingActions from "./MeetingActions";
 
-const ActionsBar = ({ isActionError, isRetryingAction, currentMeeting }) => {
+const ActionsBar = ({ isReadOnlyDevice, isActionError, isRetryingAction, currentMeeting }) => {
+  if (isReadOnlyDevice) return null;
   if (isActionError || isRetryingAction) return <ActionError/>;
   if (!currentMeeting) return <RoomAvailable/>;
 
@@ -14,6 +20,7 @@ const ActionsBar = ({ isActionError, isRetryingAction, currentMeeting }) => {
 };
 
 const mapStateToProps = state => ({
+  isReadOnlyDevice: isReadOnlyDeviceSelector(state),
   currentMeeting: currentMeetingSelector(state),
   isActionError: isActionErrorSelector(state),
   isRetryingAction: isRetryingActionSelector(state)

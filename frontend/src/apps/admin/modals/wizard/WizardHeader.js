@@ -1,5 +1,5 @@
 import React from "react";
-import colors from "../../../theme/colors";
+import colors from "../../../../theme/colors";
 import styled from "styled-components/macro";
 import { useWizard } from "./Wizard";
 

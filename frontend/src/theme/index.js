@@ -1,5 +1,7 @@
 export { default as Alert } from "./components/Alert";
 export { default as Button } from "./components/Button";
+export { default as Checkbox } from "./components/Checkbox";
+export { default as InlineHelp } from "./components/InlineHelp";
 export { default as Badge } from "./components/Badge";
 export { default as Card } from "./components/Card";
 export { default as Modal } from "./components/Modal";

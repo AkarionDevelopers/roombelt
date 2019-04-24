@@ -45,6 +45,13 @@ const serviceAuthProvider = (config, credentials) => async cb => {
   cb(null, result);
 };
 
+const getStatus = (responseStatus) => {
+  const response = responseStatus && responseStatus.response && responseStatus.response.toLowerCase();
+  if (response === "declined") return "declined";
+  if (response === "accepted" || response === "organizer") return "accepted";
+  return "tentative";
+};
+
 const consumeStream = (stream) => new Promise(resolve => {
   const chunks = [];
   stream.on("data", chunk => chunks.push(chunk));
@@ -199,7 +206,7 @@ module.exports = class {
     }
   }
 
-  async getEvents(calendarId, options = { invalidateCache: false }) {
+  async getEvents(calendarId, options = { invalidateCache: false, showTentativeMeetings: false }) {
     await this.assertCalendar(calendarId);
 
     const cacheKey = `events-${this.cacheKey}-${calendarId}`;
@@ -220,22 +227,24 @@ module.exports = class {
         .top(100)
         .get();
 
-      result = value.map(event => ({
-        id: event.id,
-        summary: event.subject,
-        organizer: { displayName: event.organizer && event.organizer.emailAddress && event.organizer.emailAddress.name },
-        isAllDayEvent: event.isAllDay,
-        start: getTime(event.start, event.isAllDay),
-        end: getTime(event.end, event.isAllDay),
-        attendees: event.attendees.map(attendee => ({ displayName: attendee.emailAddress && attendee.emailAddress.name })),      // TODO
-        isCheckedIn: event.extensions ? event.extensions.some(el => el.isCheckedIn) : false,
-        isPrivate: event.sensitivity === "private"
-      }));
+      result = value
+        .map(event => ({
+          id: event.id,
+          summary: event.subject,
+          organizer: { displayName: event.organizer && event.organizer.emailAddress && event.organizer.emailAddress.name },
+          isAllDayEvent: event.isAllDay,
+          start: getTime(event.start, event.isAllDay),
+          end: getTime(event.end, event.isAllDay),
+          attendees: event.attendees.map(attendee => ({ displayName: attendee.emailAddress && attendee.emailAddress.name })),      // TODO
+          isCheckedIn: event.extensions ? event.extensions.some(el => el.isCheckedIn) : false,
+          isPrivate: event.sensitivity === "private",
+          status: getStatus(event.responseStatus)
+        }));
 
       await cache.set(cacheKey, result, CACHE_TTL);
     }
 
-    return result;
+    return result.filter(event => event.status === "accepted" || (options.showTentativeMeetings && event.status === "tentative"));
   }
 
   async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
