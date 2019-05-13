@@ -34,13 +34,6 @@ export const adminActions = {
       getUserDetails()
     ]);
 
-    if (window.drift) {
-      window.drift.identify(user.subscriptionPassthrough, {
-        name: user.displayName,
-        subscription: user.subscriptionPassthrough
-      });
-    }
-
     if (process.env.REACT_APP_LOGROCKET_ID) {
       const LogRocket = require("logrocket");
       LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
