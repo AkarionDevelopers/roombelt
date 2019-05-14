@@ -22,5 +22,5 @@ export function prettyFormatMinutes(totalMinutes) {
 export function getMeetingSummary(meeting) {
   if (!meeting) return null;
   if (meeting.isPrivate) return i18next.t("meeting.private");
-  return meeting.summary || i18next.t("meeting.no-title");
+  return `${meeting.summary.substr(0, 5)}...` || i18next.t("meeting.no-title");
 }
