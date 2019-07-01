@@ -29,6 +29,10 @@ const Indent = styled.div`
   }
 `;
 
+function firstLetterUpperCase(str) {
+  return str.substr(0, 1).toUpperCase() + str.substr(1);
+}
+
 const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isAmPmClock }) => {
   const getTitle = () => {
     if (!currentMeeting && !nextMeeting) {
@@ -53,11 +57,30 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
     );
   };
 
+  let externalGuests = false;
   const guests = currentMeeting && !currentMeeting.isPrivate && currentMeeting.attendees.map((u) => {
-    console.log(u);
+    if(u.displayName === currentMeeting.organizer.displayName) {
+      return null;
+    }
+    // internal
+    if(u.displayName.endsWith('@akarion.com') && u.displayName.includes('.')) {
+      const name = u.displayName.split('@')[0].split('.');
+      return `${firstLetterUpperCase(name[0])} ${firstLetterUpperCase(name[1])}`
+    }
+    // external guests
+    if(u.displayName.includes('@')) {
+      if(externalGuests) {
+        return null;
+      }
+      externalGuests = true;
+      return 'External Guests';
+    }
+    // the meeting room itself
+    if(u.displayName.startsWith('Akarion ')) {
+      return null;
+    }
     return u.displayName;
-  });
-  console.log(currentMeeting);
+  }).filter(u => !!u);
   
   // filter(u => u.displayName !== currentMeeting.organizer.displayName);
 
