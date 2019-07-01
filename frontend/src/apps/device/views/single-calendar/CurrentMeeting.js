@@ -53,7 +53,12 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
     );
   };
 
-  const guests = currentMeeting && !currentMeeting.isPrivate && currentMeeting.attendees.filter(u => u.displayName !== currentMeeting.organizer.displayName);
+  const guests = currentMeeting && !currentMeeting.isPrivate && currentMeeting.attendees.map((u) => {
+    console.log(u);
+    return u.displayName;
+  });
+  
+  // filter(u => u.displayName !== currentMeeting.organizer.displayName);
 
   return (
     <Wrapper>
