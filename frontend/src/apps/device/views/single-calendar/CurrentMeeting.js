@@ -57,6 +57,7 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
     console.log(u);
     return u.displayName;
   });
+  console.log(currentMeeting);
   
   // filter(u => u.displayName !== currentMeeting.organizer.displayName);
 
@@ -70,7 +71,7 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
         <AccountBox style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>
           {currentMeeting.organizer.displayName}
-          {guests.length > 0 && guests.length <= 5 && (", " + guests.map(u => u.displayName).join(", "))}
+          {guests.length > 0 && guests.length <= 5 && (", " + guests.join(", "))}
           {guests.length > 0 && guests.length > 5 && (" " + i18next.t("meeting.guests", { count: guests.length }))}
         </span>
       </Indent>}
