@@ -90,7 +90,7 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
       {currentMeeting && !currentMeeting.isPrivate && <Indent>
         <AccountBox style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>
-          {guests.length > 0 && guests.length <= 5 && (", " + guests.join(", "))}
+          {guests.length > 0 && guests.length <= 5 && (guests.join(", "))}
           {guests.length > 0 && guests.length > 5 && (" " + i18next.t("meeting.guests", { count: guests.length }))}
         </span>
       </Indent>}
