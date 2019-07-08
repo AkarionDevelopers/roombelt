@@ -59,9 +59,6 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
 
   let externalGuests = false;
   const guests = currentMeeting && !currentMeeting.isPrivate && currentMeeting.attendees.map((u) => {
-    if(u.displayName === currentMeeting.organizer.displayName) {
-      return null;
-    }
     // internal
     if(u.displayName.endsWith('@akarion.com') && u.displayName.includes('.')) {
       const name = u.displayName.split('@')[0].split('.');
@@ -93,7 +90,6 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
       {currentMeeting && !currentMeeting.isPrivate && <Indent>
         <AccountBox style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>
-          {currentMeeting.organizer.displayName}
           {guests.length > 0 && guests.length <= 5 && (", " + guests.join(", "))}
           {guests.length > 0 && guests.length > 5 && (" " + i18next.t("meeting.guests", { count: guests.length }))}
         </span>
